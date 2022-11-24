@@ -71,7 +71,6 @@ for i in range(intervalos):
 tabla = list(zip(clase, frecuencia,frecuenciaAcomulada,frecuenciaRelativa,frecuenciaRelativaAcomulada,porcentaje,porcentajeAcomulado,marcasClase))
 df = pd.DataFrame(tabla,columns=['Intervalos','Frecuencia fi','Acomulada Fi','Frecuencia Relativa hi','Relativa acomulada Hi','Porcentaje pi %','Porcentaje Acomulada Pi %','Marca de Clase'])
 print(df)
-<<<<<<< HEAD
 print('El valor máximo en el registro es: ',int(ordenado.max()))
 print('El valor mínimo en el registro es: ',int(ordenado.min()))
 print('El rango de los datos es: ',rango)
@@ -121,17 +120,3 @@ ax[2].set_title("Histograma")
 ax[2].set_ylabel('Frecuencia')
 ax[2].set_xlabel('Intervalo')
 plot.show()
-=======
-print('Escriba el número del percentil buscado')
-k=int(input())
-I=(frecuenciaAcomulada[-1]*k/100)
-busqueda=0
-for i in range (intervalos):
-    if I<frecuenciaAcomulada[i]:
-        busqueda=i
-        break
-percentil=clase[busqueda][0]+((I-df['Acomulada_Fi'][busqueda-1])/(df['Absoluta_fi'][busqueda]))*(df['Intervalo'][busqueda][1]-df['Intervalo'][busqueda][0])
-print('Por lo tanto P'+str(k)+'=',percentil)
-
-
->>>>>>> 6e3ccd3 (Falta poner bien las gráficas)
