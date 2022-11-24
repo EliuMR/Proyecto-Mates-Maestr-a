@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plot
 import numpy as np 
 import seaborn as sns
+print('')
 print('********************************')
 print('Author: Eliú Moreno Ramírez')
 print('Created on Nov 2022')
