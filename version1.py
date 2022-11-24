@@ -9,9 +9,8 @@ print('Author: Eliú Moreno Ramírez')
 print('Created on Nov 2022')
 print('Proyecto Estadística')
 print('********************************')
-print('En un estudio de ruptura de la urdimbre durante el tejido de telas(Technometrics, 1982:63), se sometieron a prueba 100 muestras de hulo. Se determinó el número de ciclos de esfuerzo hasta ruptura para cada muestra de hilo y se obtuvieron los datos siguientes: ')
+print('En un estudio de ruptura de la urdimbre durante el tejido de telas(Technometrics, 1982:63), se sometieron a prueba 100 muestras de hilo. Se determinó el número de ciclos de esfuerzo hasta ruptura para cada muestra de hilo y se obtuvieron los datos siguientes: ')
 df=pd.read_excel('Datos.xlsx')
-#print(df)
 ordenado =df.sort_values('Valores',ascending=True) #Ordenamos los valores en orden ascendente
 oo = np.array(ordenado).reshape(len(ordenado))#creamos el array para la grafica de caja
 #print(ordenado.head())
@@ -81,15 +80,19 @@ print('El rango de los datos es: ',rango)
 #Definimos una función para el cálculo de cuantiles
 def percentil(k):
     I=(frecuenciaAcomulada[intervalos-1]*k/100)
-    busqueda=0
-    for i in range (len(frecuenciaAcomulada)):
-        if I<frecuenciaAcomulada[i]:
-            busqueda=i
-            break
-    percentil=clase[busqueda][0]+((I-frecuenciaAcomulada[busqueda-1])/(frecuencia[busqueda]))*(clase[busqueda][1]-clase[busqueda][0])
+    if I<frecuenciaAcomulada[0]:
+       percentil=clase[0][0]+((I)/frecuencia[0])*amplitud
+    else:    
+        busqueda=0
+        #Buscamos la clase
+        for i in range (len(frecuenciaAcomulada)):
+            if I<frecuenciaAcomulada[i]:
+                busqueda=i
+                break
+        percentil=clase[busqueda][0]+((I-frecuenciaAcomulada[busqueda-1])/(frecuencia[busqueda]))*(clase[busqueda][1]-clase[busqueda][0])
     print('Por lo tanto P'+str(k)+'=',percentil)
 print('El cálculo de algunos cuantiles son: ')
-#percentil(10)
+percentil(10)
 percentil(25)
 percentil(75)
 percentil(80)
@@ -113,7 +116,7 @@ media=suma/(frecuenciaAcomulada[-1])
 print('La media de los datos es: ',media)
 
 #Mediana
-mediana=(datos[50][0]+datos[51][0])/2
+mediana=(datos[49][0]+datos[50][0])/2
 print('La mediana de los datos es: ', mediana)
 
 #Moda
@@ -135,10 +138,10 @@ var=0
 for i in range(frecuenciaAcomulada[-1]):
     termino=(datos[i][0]-media)**2
     suma=suma+termino
-varianza=suma/100
+varianza=suma/frecuenciaAcomulada[-1]
 print('La varianza es: ',varianza)
 
-#desviación estandas
+#desviación estandar
 desviacionEstandar=np.sqrt(varianza)
 print('La desviación estandar es: ', desviacionEstandar)
 #Esperanza
@@ -149,43 +152,73 @@ print('El primer momento es: ',media)
 print('El segundo momento es: ', varianza)
 #tercer momento
 ter=0
-for i in range(100):
+for i in range(frecuenciaAcomulada[-1]):
     termino=(datos[i][0]-media)**3
     ter=ter+termino
-tercer=ter/(100*desviacionEstandar**3)
+tercer=ter/(frecuenciaAcomulada[-1]*desviacionEstandar**3)
 print('El tercer momento es: ',tercer)
 
-#sns.boxplot(x=oo)
-#plot.show()
-#Esta Parte es para crear intervalos y agregar el histograma
 
-claseIntervalos=[]
+#Esta parte es sólo para crear marcas de clase de manera de strings para las graaficas
+claseMarcas=[]
 for i in range(intervalos):
-    claseIntervalos.append(str(clase[i]))   
-"""
-plot.bar(claseIntervalos,df['Frecuencia fi'])
-plot.show()"""
+    claseMarcas.append(str(marcasClase[i]))  
 
-#Aquí creamos solo un intervalo para crear el histograma
-aux=[]
-for j in range(intervalos):
-    for i in range(frecuencia[j]):
-        aux.append(marcasClase[j])
-fig, ax = plot.subplots(5, figsize=(4,16))
-ax[0].barh(marcasClase,df['Frecuencia fi'],color='r')
-ax[0].set_title("Gráfica de Barras")
-ax[0].set_xlabel('Frecuencia')
-ax[0].set_ylabel('Intervalo')
-ax[1].plot(marcasClase,frecuencia,'D')
-ax[1].plot(marcasClase,frecuencia,'b')
-ax[1].set_title("Poligono de frecuencias")
-ax[1].set_ylabel('Frecuencia')
-ax[1].set_xlabel('Intervalo')
-ax[2].hist(x=aux, bins=intervalos, color='g', rwidth=0.85)
-ax[2].set_title("Histograma")
-ax[2].set_ylabel('Frecuencia')
-ax[2].set_xlabel('Intervalo')
-sns.boxplot(ax=ax[3],x=oo)
-ax[4].bar(claseIntervalos,df['Frecuencia fi'])
-
-plot.show()
+def MenuGrafico():
+    grafos=['1-Barras','2-Histograma','3-Poligono','4-Caja','5-Baston']
+    print('Presione el número del grafo que desea graficar ',grafos,' : ')
+    graficaSalir=int(input())
+    if graficaSalir==1:
+        plot.bar(claseMarcas,df['Frecuencia fi'],color='r')
+        plot.ylabel('Frecuencia')
+        plot.xlabel('Marca de clase')
+        plot.title('Gráfica de barras')
+        plot.show()
+    elif graficaSalir==2:
+        #Esta Parte es para crear intervalos y agregar el histograma
+        claseIntervalos=[]
+        for i in range(intervalos):
+            claseIntervalos.append(str(clase[i]))   
+        plot.bar(claseIntervalos,df['Frecuencia fi'],color='Orange')
+        plot.ylabel('Frecuencia')
+        plot.xlabel('Intervalos')
+        plot.title('Histograma de Frecuencia')
+        plot.show()
+    elif graficaSalir==3:
+        plot.plot(marcasClase,frecuencia,'D')
+        plot.plot(marcasClase,frecuencia,'b')
+        plot.title("Poligono de frecuencias")
+        plot.ylabel('Frecuencia')
+        plot.xlabel('Intervalo')
+        plot.show()
+    elif graficaSalir==4:
+        sns.boxplot(y=oo,color='purple')
+        plot.ylabel('Muestras de Hilo')
+        plot.title('Diagrama de caja')
+        plot.show()
+    elif graficaSalir==5:
+        for i in range(10):
+            x=[0,0]
+            y=[0,0]
+            x[0]=marcasClase[i]
+            x[1]=marcasClase[i]
+            y[1]=frecuencia[i]
+            plot.plot(x,y,color='g')
+            plot.title('Gráfica de Bastón')
+            plot.ylabel('Frecuencia')
+            plot.xlabel('Clases')
+            plot.plot(x[1],y[1],'D',color='g')
+        plot.show()
+    else:
+        print('Por favor escriba un número válido que corresponda a una gráfica')
+        MenuGrafico()
+MenuGrafico()
+bandera='True'
+while bandera:
+    print('¿Desea ver otra gráfica?[S/N]')
+    respuesta=input()
+    if respuesta=='S':
+        MenuGrafico()
+    else:
+        bandera=False
+print('Gracias por ejecutar este programa')
